@@ -1,0 +1,28 @@
+{
+  "name": "finapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielSup2/node-finApi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GabrielSup2/node-finApi/issues"
+  },
+  "homepage": "https://github.com/GabrielSup2/node-finApi#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  }
+}
