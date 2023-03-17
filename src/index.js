@@ -8,11 +8,17 @@ app.use(express.json())
 
 const customers = []
 
+//const findCostumer = (costumer) =>{customers.find(customer =>{  customer.cpf == costumer.cpf})}
+
 const verifyIfExistsCpfAccount = (req, res, next) =>{
 
-   const {cpf } = req.headers
+   const {cpf} = req.headers
 
-   const customerFoundByCpf = customers.some(   (customer) => customer.cpf === cpf)
+   const customerFoundByCpf = customers.find( (customer) => {
+      return  customer.cpf == cpf;
+   })
+   
+   console.log(customerFoundByCpf)
 
    if(!customerFoundByCpf){
       return res.status(400).json({
@@ -25,11 +31,11 @@ const verifyIfExistsCpfAccount = (req, res, next) =>{
 
 }
 
-
 app.post("/account", (req,res)=>{
    const {cpf, name }= req.headers
    
    const customerAlreadyExists = customers.some(customer => customer.cpf == cpf)
+
 
    if(customerAlreadyExists){
       return res.status(400).json({
@@ -37,6 +43,7 @@ app.post("/account", (req,res)=>{
       })
    }
 
+   
 
    customers.push({
       cpf,
@@ -45,7 +52,9 @@ app.post("/account", (req,res)=>{
       statement : []
    })
 
-   return res.status(201).json({
+ 
+
+   res.status(201).json({
       msg : "User created",
       UserInfo : { cpf, name }
       }
@@ -53,16 +62,30 @@ app.post("/account", (req,res)=>{
    )
 })
 
-app.use(verifyIfExistsCpfAccount)
-
-app.get("/statement" , verifyIfExistsCpfAccount , (req, res)=>{
+app.get("/statement"  , verifyIfExistsCpfAccount, (req, res)=>{
    const {customer} = req
+
    return res.json({
       info : customer.statement
       })
 })
 
+app.post("/deposit", verifyIfExistsCpfAccount, (req, res )=>{
+   
+   const {description , amount} = req.body
+   const {customer} = req
+   const operationInfo = {
+      description,
+      amount,
+      create_at : new Date()
+   }
+   
+   customer.statement.push(operationInfo)
 
+   return res.status(201).send("Deposit created!")
+
+
+} )
 
 
 app.listen(3333)
