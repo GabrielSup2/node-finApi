@@ -8,27 +8,61 @@ app.use(express.json())
 
 const customers = []
 
-app.post("/account", (req,res)=>{
-   const {cpf, name }= req.body
-   
+const verifyIfExistsCpfAccount = (req, res, next) =>{
 
-const customerAlreadyExists = customers.some(
-      (customer) => customer.cpf === cpf)
-   
-if(customerAlreadyExists){
-      return res.status(404).json({
-      error : "Customer already exists"
-   })
+   const {cpf } = req.headers
+
+   const customerFoundByCpf = customers.some(   (customer) => customer.cpf === cpf)
+
+   if(!customerFoundByCpf){
+      return res.status(400).json({
+         error : "Customer not Found"
+      })
+   }
+
+   req.customer = customerFoundByCpf
+   return next()
+
 }
 
-customers.push({
+
+app.post("/account", (req,res)=>{
+   const {cpf, name }= req.headers
+   
+   const customerAlreadyExists = customers.some(customer => customer.cpf == cpf)
+
+   if(customerAlreadyExists){
+      return res.status(400).json({
+         error : "User already exists"
+      })
+   }
+
+
+   customers.push({
       cpf,
       name,
       id : uuidv4(),
       statement : []
    })
 
-   return res.status(201).send(customers)
+   return res.status(201).json({
+      msg : "User created",
+      UserInfo : { cpf, name }
+      }
+         
+   )
 })
+
+app.use(verifyIfExistsCpfAccount)
+
+app.get("/statement" , verifyIfExistsCpfAccount , (req, res)=>{
+   const {customer} = req
+   return res.json({
+      info : customer.statement
+      })
+})
+
+
+
 
 app.listen(3333)
